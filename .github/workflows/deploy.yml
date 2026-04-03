@@ -1,0 +1,62 @@
+name: Deploy webgis to GitHub Pages
+
+on:
+  # Executa o workflow sempre que houver um push na branch 'main'
+  push:
+    branches:
+      - main
+  # Permite rodar este workflow manualmente na aba Actions
+  workflow_dispatch:
+
+# Define as permissões necessárias para usar o GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite apenas um deploy simultâneo
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  # Job de Build
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' 
+          cache: 'npm'
+          
+      - name: Instalar dependências
+        run: npm ci
+        
+      - name: Build do projeto
+        run: npm run build
+        
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload dos artefatos
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # O build do Vite gera os arquivos na pasta dist
+          path: './dist' 
+
+  # Job de Deploy
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - name: Deploy para GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
