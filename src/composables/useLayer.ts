@@ -1,5 +1,5 @@
 import { watch } from 'vue'
-import type Map from 'ol/Map'
+import type OLMap from 'ol/Map'
 import TileLayer from 'ol/layer/Tile'
 import VectorLayer from 'ol/layer/Vector'
 import XYZ from 'ol/source/XYZ'
@@ -11,7 +11,7 @@ import { useLayersStore } from '../stores/layers'
 import { useLayerStyle } from './useLayerStyle'
 import type { LayerConfig } from '../types'
 
-export function useLayer(mapRef: { value: Map | null }) {
+export function useLayer(mapRef: { value: OLMap | null }) {
   const layersStore = useLayersStore()
   const { getStyle } = useLayerStyle()
   

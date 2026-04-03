@@ -20,8 +20,11 @@ const layersStore = useLayersStore()
 onMounted(async () => {
   workspaces.value = await apiFetch<Workspace[]>('/workspaces')
   if (workspaces.value.length > 0) {
-    selected.value = workspaces.value[0].id
-    layersStore.fetchLayers(selected.value)
+    const firstWorkspace = workspaces.value[0]
+    if (firstWorkspace) {
+      selected.value = firstWorkspace.id
+      layersStore.fetchLayers(selected.value)
+    }
   }
 })
 
