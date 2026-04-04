@@ -9,7 +9,8 @@ export class ApiError extends Error {
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const authStore = useAuthStore()
   const token = authStore.token
-  const res = await fetch(`/api${path}`, {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
+  const res = await fetch(`${baseUrl}/api${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
