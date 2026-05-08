@@ -1,57 +1,75 @@
-# SOMAP - Plataforma WebGIS
+# SOMAP — Spatial Observation and MAPping
 
-SOMAP é uma plataforma WebGIS moderna desenvolvida para fornecer visualização de mapas, processamento e análise de dados espaciais com alta performance e usabilidade.
+**SOMAP** é uma plataforma WebGIS desenvolvida para visualização, análise e gestão de dados geoespaciais com alta performance e usabilidade. A plataforma integra um mapa interativo com suporte a múltiplos tipos de camadas, geocodificação, busca de endereços e cálculo de rotas sobre a rede viária.
 
-## 🚀 Tecnologias Utilizadas
+O projeto é construído inteiramente no navegador, sem plugins ou instalações adicionais, e se conecta a serviços de mapas e backend próprios hospedados localmente via Cloudflare Tunnel.
 
-Este projeto foi desenvolvido utilizando as seguintes tecnologias e bibliotecas:
+---
 
-- **[Vue 3](https://vuejs.org/)**: Framework JavaScript utilizando Composition API para criação de interfaces web.
-- **[Vite](https://vitejs.dev/)**: Ferramenta de build rápida e moderna.
-- **[OpenLayers (ol)](https://openlayers.org/)**: Biblioteca robusta para criação de mapas web dinâmicos e interativos.
-- **[Tailwind CSS](https://tailwindcss.com/)**: Framework CSS utility-first que agiliza a criação de layouts responsivos.
-- **[Pinia](https://pinia.vuejs.org/)**: Gerenciamento de estado (Store) oficial para Vue.
-- **[Vue Router](https://router.vuejs.org/)**: Controle de rotas avançado na aplicação.
-- **[MSW (Mock Service Worker)](https://mswjs.io/)**: Ferramenta de mock de chamadas de API, facilitando o desenvolvimento sem depender ativamente de um backend.
-- **[TypeScript](https://www.typescriptlang.org/)**: Adiciona tipagem estática e segurança na estruturação do código.
+## Interface
 
-## 🎯 Funcionalidades Principais (Fase 1)
+### Tela de Login
 
-- **Mapa Integrado e Interativo**: Exibição da área espacial focada e controlada via componentes com suporte ao OpenLayers.
-- **Composables e Estado**: Estruturação usando hooks customizados (composables) focando nos mapas, ferramentas e sistema.
-- **Interface Gráfica (UI)**: Layouts compreendendo Sidebars de controle, Toolbars (barra de ferramentas) na interface e fluxos visuais em tela utilizando Tailwind.
-- **Mock Service Worker**: Simulando uma infraestrutura server-side para validação da UI e testes em ambiente local.
-- **Fluxo de Login**: Página pronta para controle de acessos da plataforma WebGIS simulada.
+![Tela de login do SOMAP](docs/screenshot-login.png)
 
-## 🛠️ Instalação e Configuração
+### Mapa Interativo
 
-### Pré-requisitos
+![Mapa interativo com roteirização e popup de geocodificação](docs/screenshot-map.png)
 
-Possuir o **Node.js** instalado. Recomendado versão superior à descrita no `engines` do `package.json` (Node v20.19.0+ ou >=22.12.0).
+---
 
-### Passos
+## Funcionalidades
 
-1. **Instale as dependências** do projeto:
-   ```sh
-   npm install
-   ```
+**Visualização de Camadas**
+Suporte a múltiplos tipos de fonte geoespacial num painel lateral com controle de visibilidade, opacidade e reordenação por drag-and-drop:
+- `XYZ` — tiles de raster (OpenStreetMap, imagens de satélite MAXAR)
+- `WMS` — serviços OGC (IBGE, GeoServer próprio)
+- `GeoJSON` — vetores estáticos ou servidos pelo backend
+- `WFS` — features vetoriais via protocolo OGC
 
-2. **Inicie o servidor de desenvolvimento** com Hot-Module-Replacement (HMR):
-   ```sh
-   npm run dev
-   ```
+**Workspaces**
+As camadas são organizadas em workspaces (conjuntos de dados temáticos), alternáveis via seletor no painel lateral.
 
-3. Abra `http://localhost:5173/` (ou a porta exposta pelo Vite) em seu navegador.
+**Busca e Geocodificação**
+Barra de busca que consulta uma instância local do **Nominatim (OpenStreetMap)** para converter endereços em coordenadas (forward geocoding). Cliques no mapa disparam geocodificação reversa, exibindo o endereço num popup com detalhes hierárquicos (bairro, cidade, estado).
 
-## 📦 Scripts Disponíveis
+**Roteirização**
+Modo de roteiro que permite selecionar dois pontos no mapa (A → B) e calcula a rota sobre a rede viária via backend próprio com **pgRouting**. A rota é renderizada como camada vetorial azul sobre o mapa, com zoom automático na extensão calculada e exibição do custo total (em metros ou quilômetros).
 
-Alem do `dev`, outras rotinas do npm podem ser chamadas no ambiente do projeto:
+**Dark Mode**
+Alternância entre tema claro e escuro via botão na barra de ferramentas.
 
-- `npm run build`: Roda a verificação de tipagem via `vue-tsc` e constrói os assets de produção utilizando Vite.
-- `npm run preview`: Previsualiza o bundle gerado antes da subida para o servidor externo.
-- `npm run type-check`: Faz a checagem manual das tipagens utilizando TypeScript.
-- `npm run lint`: Aciona os analisadores do código pelo ESLint customizado e Oxlint para checagem rápida de padrões.
+---
 
-## ⚙️ Ambiente de Desenvolvimento (Recomendado)
+## Arquitetura
 
-Recomenda-se utilizar a IDE [VS Code](https://code.visualstudio.com/) combinada com a extensão [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (sugere-se desabilitar o Vetur) para completo suporte à tipagem e IntelliSense. Você também pode aproveitar o [Vue.js Devtools](https://devtools.vuejs.org/) nativo para Chromium ou Firefox.
+```
+Frontend (Vue 3 + OpenLayers)
+    │
+    ├── /api/*          → Backend Python/FastAPI  (autenticação, camadas, rotas)
+    ├── Nominatim       → Geocodificação (instância local OSM)
+    └── GeoServer       → Serviço WMS/WFS de camadas vetoriais e raster
+```
+
+O frontend utiliza **MSW (Mock Service Worker)** em ambiente de desenvolvimento para simular o backend, permitindo desenvolvimento e testes sem dependência de infraestrutura ativa. Em produção, os serviços são expostos via **Cloudflare Tunnel** a partir de um servidor local **Umbrel OS**.
+
+---
+
+## Stack
+
+| Camada | Tecnologia |
+|---|---|
+| Framework UI | Vue 3 (Composition API) |
+| Build | Vite |
+| Linguagem | TypeScript |
+| Mapa | OpenLayers 10 |
+| Estado global | Pinia |
+| Estilização | Tailwind CSS |
+| Roteamento | Vue Router |
+| Mocks | MSW 2 (Mock Service Worker) |
+
+---
+
+## Deploy
+
+O frontend é publicado automaticamente no **GitHub Pages** via GitHub Actions a cada push na branch `main`. O pipeline executa verificação de tipos (`vue-tsc`) e build de produção antes do deploy.
