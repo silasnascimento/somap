@@ -51,7 +51,7 @@ export const mockLayers = [
     opacity: 1,
     zIndex: 30,
     source: {
-      url: '/mock/pontos-interesse.geojson'
+      url: `${import.meta.env.BASE_URL}mock/pontos-interesse.geojson`
     },
     style: {
       color: '#E24B4A',

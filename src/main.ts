@@ -9,7 +9,18 @@ import router from './router'
 async function enableMocking() {
   if (import.meta.env.VITE_USE_MOCKS !== 'false' && process.env.NODE_ENV !== 'production') {
     const { worker } = await import('./mocks/browser')
-    return worker.start({ onUnhandledRequest: 'bypass' })
+    // Remove old service workers safely, which might be conflicting due to base path change
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    for (const registration of registrations) {
+      await registration.unregister()
+    }
+    
+    return worker.start({ 
+      serviceWorker: {
+        url: `${import.meta.env.BASE_URL}mockServiceWorker.js`
+      },
+      onUnhandledRequest: 'bypass' 
+    })
   }
 }
 

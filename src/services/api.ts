@@ -18,6 +18,10 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
       ...options?.headers,
     },
   })
-  if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => null))
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null)
+    console.error('API Fetch Error:', { status: res.status, data: errorData, path })
+    throw new ApiError(res.status, errorData)
+  }
   return res.json()
 }
