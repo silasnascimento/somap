@@ -38,6 +38,11 @@ jobs:
         
       - name: Build do projeto
         run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_GEO_BASE_URL: ${{ secrets.VITE_GEO_BASE_URL }}
+          VITE_GEOCODING_API_URL: ${{ secrets.VITE_GEOCODING_API_URL }}
+          VITE_USE_MOCKS: "false"
         
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5

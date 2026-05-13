@@ -44,3 +44,6 @@ Nominatim_umbrel.md
 
 # Claude Code
 .claude/
+
+# Production
+.env.production
